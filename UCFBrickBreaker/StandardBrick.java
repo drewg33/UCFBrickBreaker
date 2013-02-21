@@ -11,8 +11,8 @@ public class StandardBrick extends Brick
 		super(Xpos, Xpos);
 		height = 10;
 		width = 30;
-		Xvel = 0;
-		Yvel = 0;
+		xVelocity = 0;
+		yVelocity = 0;
 		
 	}
 
@@ -27,7 +27,7 @@ public class StandardBrick extends Brick
 	{
 		super.paintComponent(g);
 		g.setColor(Color.RED);
-		g.fillRect(Xpos - (width/2), Ypos - (height/2), width, height); //made a change
+		g.fillRect(x - (width/2), y - (height/2), width, height);
 	}
 
 	@Override

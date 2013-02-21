@@ -7,14 +7,12 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class GUI extends JPanel implements MouseMotionListener,
-		MouseWheelListener
+public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener
 {
 
+	private static final long serialVersionUID = 1L;
 	private static final int SCREEN_WIDTH = 640;
 	private static final int SCREEN_HEIGHT = 480;
-
-	private static final int BALL_RADIUS = 5;
 	private static final int PADDLE_HEIGHT = 420;
 	private static final int PADDLE_WIDTH = 100;
 	private static final double PADDLE_ANGLE_DAMPER = 0.1;
@@ -22,15 +20,11 @@ public class GUI extends JPanel implements MouseMotionListener,
 	private static final double POWER_MULTIPLIER = 2;
 	private static final int REFRESH_RATE = 60;
 	private static final double GRAVITY = 0.4; // Higher is stronger gravity
-
-	private double ballX = 50;
-	private double ballY = 20;
-	private double ballXvelocity = 3;
-	private double ballYvelocity = 2;
 	private int paddleX;
 	private int powerLevel = 5;
 	
-	public ArrayList <Brick> bricks = new ArrayList <Brick>();
+	protected ArrayList <Brick> bricks = new ArrayList <Brick>();
+	protected Ball ball = new Ball(50,20,3,2,5);
 
 	public GUI()
 	{
@@ -38,7 +32,8 @@ public class GUI extends JPanel implements MouseMotionListener,
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
-		bricks.add(new StandardBrick(50,50));
+		
+		bricks.add(new StandardBrick(50,50)); //will want to add these from a config file for each level
 
 		Thread gameThread = new Thread()
 		{
@@ -48,52 +43,52 @@ public class GUI extends JPanel implements MouseMotionListener,
 				{
 
 					// Refresh ball position
-					ballX += ballXvelocity;
-					ballY += ballYvelocity;
+					ball.x += ball.xVelocity;
+					ball.y += ball.yVelocity;
 
 					// Check vertical boundaries
-					if (ballX - BALL_RADIUS < 0)
+					if (ball.x - ball.radius < 0)
 					{
-						ballXvelocity = -ballXvelocity; // Reflect along normal
-						ballX = BALL_RADIUS; // Re-position the ball at the edge
-					} else if (ballX + BALL_RADIUS > SCREEN_WIDTH)
+						ball.xVelocity = -ball.xVelocity; // Reflect along normal
+						ball.x = ball.radius; // Re-position the ball at the edge
+					} else if (ball.x + ball.radius > SCREEN_WIDTH)
 					{
-						ballXvelocity = -ballXvelocity;
-						ballX = SCREEN_WIDTH - BALL_RADIUS;
+						ball.xVelocity = -ball.xVelocity;
+						ball.x = SCREEN_WIDTH - ball.radius;
 					}
 
 					// Check horizontal boundaries
-					if (ballY - BALL_RADIUS < 0)
+					if (ball.y - ball.radius < 0)
 					{
-						ballYvelocity = -ballYvelocity;
-						ballY = BALL_RADIUS;
-					} else if (ballY + BALL_RADIUS > SCREEN_HEIGHT)
+						ball.yVelocity = -ball.yVelocity;
+						ball.y = ball.radius;
+					} else if (ball.y + ball.radius > SCREEN_HEIGHT)
 					{
-						ballYvelocity = -ballYvelocity;
-						ballY = SCREEN_HEIGHT - BALL_RADIUS;
+						ball.yVelocity = -ball.yVelocity;
+						ball.y = SCREEN_HEIGHT - ball.radius;
 					}
 
 					// Check if hit paddle
-					if (ballY + BALL_RADIUS > PADDLE_HEIGHT
-							&& ballX < paddleX + PADDLE_WIDTH / 2
-							&& ballX > paddleX - PADDLE_WIDTH / 2
-							&& ballYvelocity > 0)
+					if (ball.y + ball.radius > PADDLE_HEIGHT
+							&& ball.x < paddleX + PADDLE_WIDTH / 2
+							&& ball.x > paddleX - PADDLE_WIDTH / 2
+							&& ball.yVelocity > 0)
 					{
-						ballYvelocity = (-ballYvelocity)
+						ball.yVelocity = (-ball.yVelocity)
 								- ((powerLevel - 5) * POWER_MULTIPLIER)
 								+ PADDLE_POWER_DAMPER;
-						powerLevel = 5;
-						if (ballYvelocity < -25)
-							ballYvelocity = -25;
-						if (ballYvelocity > -5)
-							ballYvelocity = -5;
-						ballY = PADDLE_HEIGHT - BALL_RADIUS;
+						//powerLevel = 5;
+						if (ball.yVelocity < -25)
+							ball.yVelocity = -25;
+						if (ball.yVelocity > -5)
+							ball.yVelocity = -5;
+						ball.y = PADDLE_HEIGHT - ball.radius;
 
-						ballXvelocity = (ballX - paddleX) * PADDLE_ANGLE_DAMPER;
+						ball.xVelocity = (ball.x - paddleX) * PADDLE_ANGLE_DAMPER;
 					}
 
 					// Account for acceleration (gravity)
-					ballYvelocity += GRAVITY;
+					ball.yVelocity += GRAVITY;
 
 					repaint();
 
@@ -150,8 +145,8 @@ public class GUI extends JPanel implements MouseMotionListener,
 
 		// Draw the ball
 		g.setColor(Color.black);
-		g.fillOval((int) (ballX - BALL_RADIUS), (int) (ballY - BALL_RADIUS),
-				(int) (2 * BALL_RADIUS), (int) (2 * BALL_RADIUS));
+		g.fillOval((int) (ball.x - ball.radius), (int) (ball.y - ball.radius),
+				(int) (2 * ball.radius), (int) (2 * ball.radius));
 
 		// Draw the paddle
 		g.setColor(Color.black);
