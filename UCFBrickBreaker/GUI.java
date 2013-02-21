@@ -24,7 +24,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 	private int powerLevel = 5;
 	
 	protected ArrayList <Brick> bricks = new ArrayList <Brick>();
-	protected Ball ball = new Ball(50,20,3,2,5);
+	protected static Ball ball = new Ball(50,20,3,2,5);
 
 	public GUI()
 	{
@@ -155,6 +155,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		
 		for (Brick b:bricks)
 		{
+			b.detectImpact();
 			b.paintComponent(g);
 		}
 	}

@@ -15,7 +15,20 @@ public abstract class Brick extends JPanel
 		this.y = y;
 	}
 	public abstract void impact();
-	public abstract void detectImpact();
+	public boolean detectImpact()
+	{
+		if (GUI.ball.x - GUI.ball.radius < x + width / 2
+			&& GUI.ball.x + GUI.ball.radius > x - width / 2
+			&& GUI.ball.y  - GUI.ball.radius < y + height / 2
+			&& GUI.ball.y  + GUI.ball.radius > y - height / 2
+			/*&& GUI.ball.yVelocity > 0*/)
+		{
+			impact();
+			return true;
+		}
+		return false;
+	}
+	
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
