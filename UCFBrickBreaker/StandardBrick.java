@@ -10,9 +10,9 @@ public class StandardBrick extends Brick
 	
 	public StandardBrick(int Xpos, int Ypos)
 	{
-		super(Xpos, Xpos);
+		super(Xpos, Ypos);
 		height = 10;
-		width = 30;
+		width = 50;
 		xVelocity = 0;
 		yVelocity = 0;
 		
@@ -26,7 +26,7 @@ public class StandardBrick extends Brick
 	}
 
 	@Override
-	public void impact()
+	public void horiz_impact()
 	{
 		//switch colors for now
 		//later change this to delete brick
@@ -35,7 +35,17 @@ public class StandardBrick extends Brick
 		else
 			color = Color.RED;
 		
-		GUI.ball.yVelocity = -GUI.ball.yVelocity;
+		//GUI.ball.yVelocity = -GUI.ball.yVelocity;
+	}
+	
+	@Override
+	public void vert_impact(){
+		if (color == Color.RED)
+			color = Color.black;
+		else
+			color = Color.RED;
+		
+		///GUI.ball.xVelocity = -GUI.ball.xVelocity;
 	}
 
 }

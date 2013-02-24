@@ -1,103 +1,95 @@
-// Hosam Bassiouni
-// Messin' around with Brick Breaker
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+//import java.util.Random;
 
 import javax.swing.*;
 
-public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener
-{
+public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
 
-	private static final long serialVersionUID = 1L;
-	private static final int SCREEN_WIDTH = 640;
-	private static final int SCREEN_HEIGHT = 480;
-	private static final int PADDLE_HEIGHT = 420;
-	private static final int PADDLE_WIDTH = 100;
-	private static final double PADDLE_ANGLE_DAMPER = 0.1;
-	private static final double PADDLE_POWER_DAMPER = 0.5;
-	private static final double POWER_MULTIPLIER = 2;
-	private static final int REFRESH_RATE = 60;
-	private static final double GRAVITY = 0.4; // Higher is stronger gravity
-	private int paddleX;
-	private int powerLevel = 5;
+	static final long serialVersionUID = 1L;
+	protected static final int SCREEN_WIDTH = 640;
+	protected static final int SCREEN_HEIGHT = 480;
+	protected static final int PADDLE_HEIGHT = 440;
+	protected static final int PADDLE_WIDTH = 100;
+	protected static final double PADDLE_ANGLE_DAMPER = 0.15;
+	protected static final double PADDLE_POWER_DAMPER = 1;
+	protected static final double POWER_MULTIPLIER = 2;
+	protected static final int REFRESH_RATE = 60;
+	protected static final double GRAVITY = 0.2; // Higher is stronger gravity
+	protected static int paddleX = SCREEN_WIDTH/2;
+	protected static int powerLevel = 5;
+
 	
-	protected ArrayList <Brick> bricks = new ArrayList <Brick>();
-	protected static Ball ball = new Ball(50,20,3,2,5);
+	protected static ArrayList <Brick> bricks = new ArrayList <Brick>();
+	protected static ArrayList <Ball> balls = new ArrayList<Ball>();
+	protected static ArrayList <Powerup> powerups = new ArrayList <Powerup>();
+	protected static ArrayList <Score> scores = new ArrayList <Score>();
+	
+	protected static int score = 0;
 
-	public GUI()
-	{
+	public GUI() {
 
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
+		this.addMouseListener(this);
 		
-		bricks.add(new StandardBrick(50,50)); //will want to add these from a config file for each level
-
-		Thread gameThread = new Thread()
-		{
-			public void run()
-			{
-				while (true)
-				{
-
-					// Refresh ball position
-					ball.x += ball.xVelocity;
-					ball.y += ball.yVelocity;
-
-					// Check vertical boundaries
-					if (ball.x - ball.radius < 0)
-					{
-						ball.xVelocity = -ball.xVelocity; // Reflect along normal
-						ball.x = ball.radius; // Re-position the ball at the edge
-					} else if (ball.x + ball.radius > SCREEN_WIDTH)
-					{
-						ball.xVelocity = -ball.xVelocity;
-						ball.x = SCREEN_WIDTH - ball.radius;
+		//bricks.add(new StandardBrick(300,150));
+		balls.add(new Ball());
+		//Random gen = new Random();
+		//for(int i=0; i<10; i++) bricks.add(new StandardBrick(gen.nextInt(SCREEN_WIDTH), gen.nextInt(SCREEN_HEIGHT)));
+		
+		
+		Thread gameThread = new Thread(){
+			
+			public void run(){
+				
+				while (true){
+					
+					int toRemove = 0;
+					boolean removing = false;
+					
+					for(Ball b:balls){
+						b.updateMetrics();
+						if(b.destroy){
+							toRemove = balls.indexOf(b);
+							removing = true;
+						}
 					}
-
-					// Check horizontal boundaries
-					if (ball.y - ball.radius < 0)
-					{
-						ball.yVelocity = -ball.yVelocity;
-						ball.y = ball.radius;
-					} else if (ball.y + ball.radius > SCREEN_HEIGHT)
-					{
-						ball.yVelocity = -ball.yVelocity;
-						ball.y = SCREEN_HEIGHT - ball.radius;
+					
+					if(removing) balls.remove(toRemove);
+					if(balls.size()==0) balls.add(new Ball());
+					
+					removing = false;
+					
+					for(Powerup p:powerups){
+						p.updateMetrics();
+						if(p.destroy){
+							toRemove = powerups.indexOf(p);
+							removing = true;
+						}
 					}
-
-					// Check if hit paddle
-					if (ball.y + ball.radius > PADDLE_HEIGHT
-							&& ball.x < paddleX + PADDLE_WIDTH / 2
-							&& ball.x > paddleX - PADDLE_WIDTH / 2
-							&& ball.yVelocity > 0)
-					{
-						ball.yVelocity = (-ball.yVelocity)
-								- ((powerLevel - 5) * POWER_MULTIPLIER)
-								+ PADDLE_POWER_DAMPER;
-						//powerLevel = 5;
-						if (ball.yVelocity < -25)
-							ball.yVelocity = -25;
-						if (ball.yVelocity > -5)
-							ball.yVelocity = -5;
-						ball.y = PADDLE_HEIGHT - ball.radius;
-
-						ball.xVelocity = (ball.x - paddleX) * PADDLE_ANGLE_DAMPER;
+					
+					if(removing) powerups.remove(toRemove);
+					
+					removing = false;
+					
+					for(Score s:scores){
+						s.updateMetrics();
+						if(s.destroy){
+							toRemove = scores.indexOf(s);
+							removing = true;
+						}
 					}
-
-					// Account for acceleration (gravity)
-					ball.yVelocity += GRAVITY;
-
+					
+					if(removing) scores.remove(toRemove);
+					
 					repaint();
 
-					try
-					{
+					try{
 						Thread.sleep(1000 / REFRESH_RATE);
-					} catch (Exception e)
-					{
-					}
+					} catch (Exception e) {}
 				}
 			}
 		};
@@ -142,33 +134,48 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		g.drawLine(580, 56, 613, 56);
 		g.drawString("Power Level:", 563, 102);
 		g.drawString("" + (powerLevel - 5), 594, 120);
+		g.drawString("Score: "+score, 20, 20);
 
 		// Draw the ball
 		g.setColor(Color.black);
-		g.fillOval((int) (ball.x - ball.radius), (int) (ball.y - ball.radius),
-				(int) (2 * ball.radius), (int) (2 * ball.radius));
-
+		for(Ball ball:balls){
+			g.fillOval((int) (ball.x - Ball.currentRadius), (int) (ball.y - Ball.currentRadius),
+					(int) (2 * Ball.currentRadius), (int) (2 * Ball.currentRadius));
+		}
 		// Draw the paddle
 		g.setColor(Color.black);
 		g.fillRoundRect(paddleX - (PADDLE_WIDTH / 2), PADDLE_HEIGHT,
 				PADDLE_WIDTH, 10, 5, 500);
 		
-		for (Brick b:bricks)
-		{
-			b.detectImpact();
+		for (Brick b:bricks){
+			//b.detectImpact();
 			b.paintComponent(g);
 		}
+		
+		for (Powerup p:powerups){
+			p.paintComponent(g);
+		}
+		
+		for (Score s:scores){
+			s.paintComponent(g);
+		}
+		
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e)
-	{
+	public void mouseMoved(MouseEvent e){
 		paddleX = e.getX();
+		int test = Powerup.generator.nextInt(400);
+		if(test==0){
+			boolean score = Powerup.generator.nextBoolean();
+			if(score) scores.add(new Score(e.getX(), 20, 100));
+			else powerups.add(new Powerup(e.getX(), 20));
+		}
 	}
-
+	
 	@Override
-	public void mouseDragged(MouseEvent e)
-	{
+	public void mouseDragged(MouseEvent e){
+		paddleX = e.getX();
 	}
 
 	@Override
@@ -195,5 +202,27 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 			}
 		}
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if(!balls.get(0).launched) balls.get(0).launch();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {		
+	}
+	
 
 }
