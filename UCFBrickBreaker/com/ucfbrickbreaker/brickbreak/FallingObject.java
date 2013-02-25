@@ -1,3 +1,4 @@
+package com.ucfbrickbreaker.brickbreak;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 

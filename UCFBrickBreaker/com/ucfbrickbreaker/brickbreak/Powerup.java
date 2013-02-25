@@ -1,3 +1,4 @@
+package com.ucfbrickbreaker.brickbreak;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
