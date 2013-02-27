@@ -19,6 +19,7 @@ public class Score extends FallingObject{
 		super.paintComponent(g);
 		g.setColor(Color.black);
 		g.drawString(""+value, x, y);
+		g.drawString(""+value, x+2, y+2);
 	}
 	
 	@Override

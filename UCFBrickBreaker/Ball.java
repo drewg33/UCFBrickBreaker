@@ -6,8 +6,8 @@ public class Ball{
 	protected static final int defaultRadius = 5;
 	protected static int currentRadius = 7;
 	
+	
 	protected static final double maxYvel = -(8.7426* Math.pow(10*GUI.GRAVITY, 0.5287))-3;
-
 	protected static final double minYvel = -15 * GUI.GRAVITY;
 	
 	
@@ -85,6 +85,7 @@ public class Ball{
 	
 			// Account for acceleration (gravity)
 			yVelocity += GUI.GRAVITY;
+			xVelocity += GUI.Xaccel;
 		}
 		
 		else {

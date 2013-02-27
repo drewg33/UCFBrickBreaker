@@ -1,8 +1,11 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 //import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
@@ -17,6 +20,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 	protected static final double POWER_MULTIPLIER = 2;
 	protected static final int REFRESH_RATE = 60;
 	protected static final double GRAVITY = 0.2; // Higher is stronger gravity
+	protected static double Xaccel = 0.2; 
 	protected static int paddleX = SCREEN_WIDTH/2;
 	protected static int powerLevel = 5;
 
@@ -121,7 +125,12 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		// Draw the background
 		g.setColor(Color.white);
 		g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+		//Image img;
+		//try {
+		//	img = ImageIO.read(new File("C:/Users/Hosam/Desktop/sun.jpg"));
+		//	g.drawImage(img, 0, 0, null);
+		//} catch (IOException e) {}
+		
 		// Draw the power meter
 		g.setColor(Color.black);
 		g.fillRect(580, 25, 34, 64);
