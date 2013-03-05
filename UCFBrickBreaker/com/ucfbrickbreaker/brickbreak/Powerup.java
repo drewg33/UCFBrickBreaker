@@ -1,3 +1,4 @@
+package com.ucfbrickbreaker.brickbreak;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
@@ -32,6 +33,7 @@ public class Powerup extends FallingObject{
 	@Override
 	public void acquireObject() {
 		if(positiveEffect) {
+			if(!GUI.balls.get(0).launched) GUI.balls.get(0).launch();
 			int x = GUI.balls.get(0).x;
 			int y = GUI.balls.get(0).y;
 			GUI.balls.add(new Ball(x, y, -2, Ball.maxYvel/4));

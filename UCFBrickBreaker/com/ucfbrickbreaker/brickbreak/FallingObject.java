@@ -1,3 +1,4 @@
+package com.ucfbrickbreaker.brickbreak;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 
@@ -7,7 +8,7 @@ public abstract class FallingObject extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	protected int x, y;
-	protected double yVelocity = 0;
+	protected double xVelocity = 0, yVelocity = 0;
 	protected boolean destroy = false;
 	
 	public FallingObject(int x, int y){
@@ -21,9 +22,16 @@ public abstract class FallingObject extends JPanel{
 		
 		// Refresh ball position
 		y += yVelocity;
+		x += xVelocity;
 
 		// Check horizontal boundary
 		if (y > GUI.SCREEN_HEIGHT){
+			destroy = true;
+			return;
+		}
+		
+		// Check vertical boundaries
+		if(x<GUI.GAME_LEFT || x>GUI.GAME_RIGHT){
 			destroy = true;
 			return;
 		}
@@ -43,6 +51,7 @@ public abstract class FallingObject extends JPanel{
 		
 		// Account for acceleration (gravity)
 		yVelocity += GUI.GRAVITY/3;
+		//xVelocity += (GUI.WIND/3);
 		
 	}
 	
