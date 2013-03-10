@@ -7,9 +7,8 @@ public class Ball{
 	protected static final int defaultRadius = 5;
 	protected static int currentRadius = 7;
 	
-	protected static final double maxYvel = -(8.7426* Math.pow(10*GUI.GRAVITY, 0.5287))-3;
-
-	protected static final double minYvel = -15 * GUI.GRAVITY;
+	protected static final double maxYvel = (-(8.7426* Math.pow(10*GUI.GRAVITY, 0.5287))-3);
+	protected static final double minYvel = (-15 * GUI.GRAVITY);
 	
 	
 	protected int x, y;
@@ -70,7 +69,7 @@ public class Ball{
 					&& x > GUI.paddleX - GUI.PADDLE_WIDTH / 2
 					&& yVelocity > 0)
 			{
-				yVelocity = (-yVelocity)
+				yVelocity = (-yVelocity) + 1
 						- ((GUI.powerLevel - 5) * GUI.POWER_MULTIPLIER)
 						+ GUI.PADDLE_POWER_DAMPER;
 				

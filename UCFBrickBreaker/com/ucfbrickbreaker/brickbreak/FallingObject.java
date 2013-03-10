@@ -51,7 +51,7 @@ public abstract class FallingObject extends JPanel{
 		
 		// Account for acceleration (gravity)
 		yVelocity += GUI.GRAVITY/3;
-		//xVelocity += (GUI.WIND/3);
+		xVelocity += (GUI.WIND/3);
 		
 	}
 	

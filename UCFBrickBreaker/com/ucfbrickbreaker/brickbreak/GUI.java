@@ -17,24 +17,24 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 	protected static final int GAME_RIGHT = (SCREEN_WIDTH/2)+(GAME_AREA_WIDTH/2);
 
 	
-	protected static final int PADDLE_HEIGHT = 440;
+	protected static final int PADDLE_HEIGHT = 450;
 	protected static final int PADDLE_WIDTH = 100;
 	protected static final double PADDLE_ANGLE_DAMPER = 0.15;
-	protected static final double PADDLE_POWER_DAMPER = 1;
+	protected static final double PADDLE_POWER_DAMPER = 0.75;
 	protected static final double POWER_MULTIPLIER = 2;
 	protected static final int REFRESH_RATE = 60;
 	protected static final double GRAVITY = 0.2; // Higher is stronger gravity
-	protected static final double WIND = 0.1;
+	protected static double WIND = 0;
 	
 	protected static int paddleX = SCREEN_WIDTH/2;
 	protected static int powerLevel = 5;
 	protected static int energyLevel = 100;
 
 	
-	protected static int AIR_REQUIRED = 20;
-	protected static int WATER_REQUIRED = 19;
-	protected static int FUEL_REQUIRED = 20;
-	protected static int FOOD_REQUIRED = 20;
+	protected static int AIR_REQUIRED = 5;
+	protected static int WATER_REQUIRED = 5;
+	protected static int FUEL_REQUIRED = 5;
+	protected static int FOOD_REQUIRED = 5;
 	protected static int airGathered = 0;
 	protected static int waterGathered = 0;
 	protected static int fuelGathered = 0;
@@ -71,7 +71,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 
 			public void run(){
 				
-				int counter = 0;
+				int framecounter = 0;
 				
 				while (true){
 					
@@ -113,11 +113,14 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 					
 					if(removing) resources.remove(toRemove);
 					
-					if(counter == 15){
-						if(energyLevel < 100) energyLevel++;
-						counter = 0;
+					if(framecounter == 119){
+						updateWind();
+						framecounter = 0;
 					}
-					else counter ++;
+					else framecounter ++;
+					
+					if(framecounter%15==0) if(energyLevel < 100) energyLevel++;
+
 					
 					
 					repaint();
@@ -144,6 +147,14 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 			}
 		});
 	}
+	
+	public static void updateWind(){
+		double temp = Powerup.generator.nextDouble() * GRAVITY;
+		double tempwind = (WIND - (GRAVITY*((WIND+GRAVITY)/(2*GRAVITY)))) + temp;
+		if(tempwind > GRAVITY) tempwind = GRAVITY;
+		else if(tempwind < -GRAVITY) tempwind = -GRAVITY;
+		WIND = tempwind;
+	}
 
 	@Override
 	public void paintComponent(Graphics g)
@@ -166,7 +177,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		// Draw the paddle
 		g.setColor(Color.black);
 		g.fillRoundRect(paddleX - (PADDLE_WIDTH / 2), PADDLE_HEIGHT,
-				PADDLE_WIDTH, 10, 5, 500);
+				PADDLE_WIDTH, 10, 500, 500);
 		
 		for (Brick b:bricks){
 			//b.detectImpact();
@@ -195,7 +206,6 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		// Power meter
 		g.setColor(Color.black);
 		g.drawString("POWER", GAME_RIGHT+43, 14);
-		g.drawString("POWER", GAME_RIGHT+44, 14);
 		g.drawLine(GAME_RIGHT, 17, SCREEN_WIDTH, 17);
 		g.fillRect(GAME_RIGHT+21, 25, 34, 64);
 		g.setColor(Color.white);
@@ -205,9 +215,8 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		g.setColor(Color.black);
 		g.drawLine(GAME_RIGHT+21, 56, GAME_RIGHT+53, 56);
 		g.drawString("Boosters", GAME_RIGHT+12, 102);
-		g.drawString("Boosters", GAME_RIGHT+13, 102);
 		g.drawString("" + (powerLevel - 5), GAME_RIGHT+34, 120);
-		g.drawString("" + (powerLevel - 5), GAME_RIGHT+35, 120);
+
 
 		// Energy Meter
 		g.setColor(Color.black);
@@ -218,16 +227,14 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		if(energyLevel%5==0) g.fillRect(GAME_RIGHT+84, (int)(27 + (0.6 * (100 - energyLevel))), 10, (int)(60 - (0.6 * (100 - energyLevel))));
 		else g.fillRect(GAME_RIGHT+84, (int)(27 + (0.6 * (100 - energyLevel))), 10, (int)(60 - (0.6 * (100 - energyLevel))+1));
 		g.drawString("Energy", GAME_RIGHT+69, 102);
-		g.drawString("Energy", GAME_RIGHT+70, 102);
 		g.drawString(""+energyLevel, GAME_RIGHT+88-(""+energyLevel).length()*3, 120);
-		g.drawString(""+energyLevel, GAME_RIGHT+89-(""+energyLevel).length()*3, 120);
+
 		
 		
 		// Resources Gathered
 		g.setColor(Color.black);
 		g.drawLine(GAME_RIGHT, 138, SCREEN_WIDTH, 138);
 		g.drawString("RESOURCES", GAME_RIGHT+22, 150);
-		g.drawString("RESOURCES", GAME_RIGHT+23, 150);
 		g.drawLine(GAME_RIGHT, 152, SCREEN_WIDTH, 152);
 
 		
@@ -294,8 +301,30 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		
 		g.drawLine(GAME_RIGHT, 400, SCREEN_WIDTH, 400);
 		g.drawString("AMMUNITION", GAME_RIGHT+22, 412);
-		g.drawString("AMMUNITION", GAME_RIGHT+23, 412);
 		g.drawLine(GAME_RIGHT, 417, SCREEN_WIDTH, 417);
+		
+		
+		//ENVIRONMENT
+		g.drawLine(0, 17, GAME_LEFT, 17);
+		g.drawString("ENVIRONMENT", 18, 14);
+		g.drawString("Planet: Mars", 10, 38);
+		g.drawString("Gravity:", 10, 74);
+		g.drawLine(70, 55, 70, 75);
+		g.drawPolygon(new int[]{60, 80, 70}, new int[]{75, 75, 85}, 3);
+		g.drawString(""+GRAVITY, 80, 74);
+
+		g.drawString("Solar Wind:", 10, 110);
+		g.drawLine(30, 130, 85, 130);
+		
+		if(WIND > 0){
+			g.drawPolygon(new int[]{85, 85, 95}, new int[]{120, 140, 130}, 3);
+		}
+		else{
+			g.drawPolygon(new int[]{30, 30, 20}, new int[]{120, 140, 130}, 3);
+		}
+		g.drawString(String.format("%.2f MPH", WIND*100), 50, 160);
+		
+		
 		
 		
 		//g.setColor(Color.red);
@@ -306,6 +335,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		//g.drawString("Score: "+score, 20, 20);
 		
 	}
+	
 
 	@Override
 	public void mouseMoved(MouseEvent e){
