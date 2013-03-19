@@ -1,7 +1,9 @@
 package com.ucfbrickbreaker.brickbreak;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.lang.Math;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class Ball extends JPanel{
@@ -44,6 +46,7 @@ public class Ball extends JPanel{
 	public void paintComponent(Graphics g){
 		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/ball1.gif");
 		//i.paintIcon(this, g, x-currentRadius, y-currentRadius);
+		g.setColor(Color.BLACK);
 		g.fillOval((int) (x - currentRadius), (int) (y - Ball.currentRadius), (int) (2 * currentRadius), (int) (2 * currentRadius));
 	}
 	

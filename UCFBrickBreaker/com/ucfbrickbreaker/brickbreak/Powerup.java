@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+
 
 public class Powerup extends FallingObject{
 	
@@ -28,6 +30,8 @@ public class Powerup extends FallingObject{
 		super.paintComponent(g);
 		g.setColor(color);
 		g.fillRoundRect(x - (width/2), y - (height/2), width, height, 5, 10000);
+		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/green.png");
+		//i.paintIcon(this, g, x - (width/2), y - (height/2));
 	}
 	
 	@Override

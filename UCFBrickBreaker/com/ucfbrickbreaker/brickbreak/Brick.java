@@ -1,6 +1,8 @@
 package com.ucfbrickbreaker.brickbreak;
 import java.awt.Color;
 import java.awt.Graphics;
+
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 
@@ -52,7 +54,7 @@ public class Brick extends JPanel{
 	
 	
 	public boolean detectImpact(){
-		boolean ghostball = false;
+		boolean ghostball = !false;
 		for(Ball b:GUI.balls){
 			if(b.x>=this.x-width/2 && b.x<=this.x+width/2){	
 				if (b.y - Ball.currentRadius < this.y+height/2 && b.yVelocity<0 && b.y>this.y){
@@ -115,6 +117,8 @@ public class Brick extends JPanel{
 			g.drawString("?", x-5, y+5);
 			g.drawString("?", x-4, y+5);
 		}
+		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/brick.jpg");
+		//i.paintIcon(this, g, x - (width/2), y - (height/2));
 	}
 	
 }
