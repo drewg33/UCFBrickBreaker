@@ -43,6 +43,7 @@ public abstract class FallingObject extends JPanel{
 				&& yVelocity > 0)
 		{
 			acquireObject();
+			//GUI.playSound("C:/Users/Hosam/Desktop/collect.wav");
 			destroy = true;
 			return;
 		}

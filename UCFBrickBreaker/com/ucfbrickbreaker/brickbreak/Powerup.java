@@ -27,7 +27,7 @@ public class Powerup extends FallingObject{
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		g.setColor(color);
-		g.fillRoundRect(x - (width/2), y - (height/2), width, height, 5, 5);
+		g.fillRoundRect(x - (width/2), y - (height/2), width, height, 5, 10000);
 	}
 	
 	@Override

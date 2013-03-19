@@ -1,10 +1,17 @@
 package com.ucfbrickbreaker.brickbreak;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 //import java.util.Random;
 
+import java.io.*;
+
+
+import javax.sound.sampled.*;
+
 import javax.swing.*;
+
 
 public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
 
@@ -39,6 +46,12 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 	protected static int waterGathered = 0;
 	protected static int fuelGathered = 0;
 	protected static int foodGathered = 0;
+	
+	protected static int curFood = 333;
+	protected static int curAir = 333;
+	protected static int curWater = 333;
+	protected static int curFuel = 333;
+	
 	protected static int money = 0;
 	
 	protected Font original;
@@ -61,11 +74,52 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
 		
-		//bricks.add(new StandardBrick(300,150));
+		int height = 10;
+		
+		bricks.add(new Brick(170,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(220,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(270,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(320,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(370,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(420,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(470,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(520,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(570,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(620,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(670,height, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(720,height, Brick.BrickType.getRandom()));
+		
+		bricks.add(new Brick(170,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(220,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(270,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(320,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(370,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(420,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(470,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(520,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(570,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(620,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(670,height+50, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(720,height+50, Brick.BrickType.getRandom()));
+		
+		bricks.add(new Brick(170,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(220,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(270,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(320,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(370,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(420,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(470,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(520,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(570,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(620,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(670,height+110, Brick.BrickType.getRandom()));
+		bricks.add(new Brick(720,height+110, Brick.BrickType.getRandom()));
+		
 		balls.add(new Ball());
 		//Random gen = new Random();
 		//for(int i=0; i<10; i++) bricks.add(new StandardBrick(gen.nextInt(SCREEN_WIDTH), gen.nextInt(SCREEN_HEIGHT)));
 		
+		//playSound("kink", true);
 		
 		Thread gameThread = new Thread(){
 
@@ -111,15 +165,40 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 						}
 					}
 					
-					if(removing) resources.remove(toRemove);
+					if(removing) resources.remove(toRemove);	
+					removing = false;
+					
+					for(Brick b:bricks){
+						if(b.destroy){
+							toRemove = bricks.indexOf(b);
+							removing = true;
+							b.destroyBrick();
+						}
+						else if(b.invert){
+							b.destroy = true;
+						}
+						if(b.detectImpact()){
+							//playSound("brick", false);
+							b.invert = true;
+						}
+					}
+					
+					if(removing) {
+						//Brick temp = bricks.get(toRemove);
+						//bricks.add(new Brick(temp.x, temp.y, Brick.BrickType.getRandom()));
+						//bricks.add(new Brick(temp.x, temp.y, temp.type));
+						bricks.remove(toRemove);
+					}
+					
 					
 					if(framecounter == 119){
-						updateWind();
+						//updateWind();
 						framecounter = 0;
 					}
 					else framecounter ++;
 					
 					if(framecounter%15==0) if(energyLevel < 100) energyLevel++;
+					if(framecounter%4==0) for(Brick b:bricks)	b.updateMetrics();
 
 					
 					
@@ -134,7 +213,9 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 
 		gameThread.start();
 	}
-
+	
+	
+	
 	public static void main(String[] args){
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){
@@ -148,11 +229,36 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		});
 	}
 	
+	
+	public static void playSound(String s, boolean loop){
+		try {
+		    File yourFile = new File("C:/Users/Hosam/Desktop/brickbreak/jar/audio/"+s+".wav");
+		    AudioInputStream stream;
+		    AudioFormat format;
+		    DataLine.Info info;
+		    Clip clip;
+
+		    stream = AudioSystem.getAudioInputStream(yourFile);
+		    format = stream.getFormat();
+		    info = new DataLine.Info(Clip.class, format);
+		    clip = (Clip) AudioSystem.getLine(info);
+		    clip.open(stream);
+		    if(loop) clip.loop(Clip.LOOP_CONTINUOUSLY);
+		    else clip.start();
+		    
+			
+			
+		}
+		catch (Exception e) {;}
+	}
+	
 	public static void updateWind(){
-		double temp = Powerup.generator.nextDouble() * GRAVITY;
-		double tempwind = (WIND - (GRAVITY*((WIND+GRAVITY)/(2*GRAVITY)))) + temp;
-		if(tempwind > GRAVITY) tempwind = GRAVITY;
-		else if(tempwind < -GRAVITY) tempwind = -GRAVITY;
+		double absRange = GRAVITY/2;
+		double newRange = GRAVITY/2;
+		double temp = Powerup.generator.nextDouble() * newRange;
+		double tempwind = (WIND - (newRange*((WIND+absRange)/(2*absRange)))) + temp;
+		if(tempwind > absRange) tempwind = absRange;
+		else if(tempwind < -absRange) tempwind = -absRange;
 		WIND = tempwind;
 	}
 
@@ -165,19 +271,21 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		// Draw the background
 		g.setColor(Color.white);
 		g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/saturn1.jpg");
+		//i.paintIcon(this, g, GAME_LEFT, 0);
 
-		// Draw the ball
+		// Draw the balls
 		g.setColor(Color.black);
-		for(Ball ball:balls){
-			g.fillOval((int) (ball.x - Ball.currentRadius), (int) (ball.y - Ball.currentRadius),
-					(int) (2 * Ball.currentRadius), (int) (2 * Ball.currentRadius));
+		for(Ball b:balls){
+			b.paintComponent(g);
 		}
 		
 		
 		// Draw the paddle
 		g.setColor(Color.black);
-		g.fillRoundRect(paddleX - (PADDLE_WIDTH / 2), PADDLE_HEIGHT,
-				PADDLE_WIDTH, 10, 500, 500);
+		g.fillRoundRect(paddleX - (PADDLE_WIDTH / 2), PADDLE_HEIGHT, PADDLE_WIDTH, 10, 500, 500);
+		//i = new ImageIcon("C:/Users/Hosam/Desktop/paddle.png");
+		//i.paintIcon(this, g, paddleX - (PADDLE_WIDTH / 2), PADDLE_HEIGHT);
 		
 		for (Brick b:bricks){
 			//b.detectImpact();
@@ -277,19 +385,35 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		
 		if(airGathered >0){
 			g.setColor(Resource.AIR_COLOR);
-			g.fillRect(GAME_RIGHT+6, (int)(187 + ((double)(146/AIR_REQUIRED) * (AIR_REQUIRED - airGathered))), 10, (int)(146 - ((double)(146/AIR_REQUIRED) * (AIR_REQUIRED - airGathered))));
+			if(curAir > (int)(187 + ((double)(146/AIR_REQUIRED) * (AIR_REQUIRED - airGathered)))) {
+				curAir--;
+				g.fillRect(GAME_RIGHT+6, curAir, 10,  (333-curAir));
+			}
+			else g.fillRect(GAME_RIGHT+6, (int)(187 + ((double)(146/AIR_REQUIRED) * (AIR_REQUIRED - airGathered))), 10, (int)(146 - ((double)(146/AIR_REQUIRED) * (AIR_REQUIRED - airGathered))));
 		}
 		if(waterGathered>0){
 			g.setColor(Resource.WATER_COLOR);
-			g.fillRect(GAME_RIGHT+36, (int)(187 + ((double)(146/WATER_REQUIRED) * (WATER_REQUIRED - waterGathered))), 10, (int)(146 - ((double)(146/WATER_REQUIRED) * (WATER_REQUIRED - waterGathered))));
+			if(curWater > (int)(187 + ((double)(146/WATER_REQUIRED) * (WATER_REQUIRED - waterGathered)))) {
+				curWater--;
+				g.fillRect(GAME_RIGHT+36, curWater, 10,  (333-curWater));
+			}
+			else g.fillRect(GAME_RIGHT+36, (int)(187 + ((double)(146/WATER_REQUIRED) * (WATER_REQUIRED - waterGathered))), 10, (int)(146 - ((double)(146/WATER_REQUIRED) * (WATER_REQUIRED - waterGathered))));
 		}
 		if(fuelGathered>0){
 			g.setColor(Resource.FUEL_COLOR);
-			g.fillRect(GAME_RIGHT+70, (int)(187 + ((double)(146/FUEL_REQUIRED) * (FUEL_REQUIRED - fuelGathered))), 10, (int)(146 - ((double)(146/FUEL_REQUIRED) * (FUEL_REQUIRED - fuelGathered))));
+			if(curFuel > (int)(187 + ((double)(146/FUEL_REQUIRED) * (FUEL_REQUIRED - fuelGathered)))) {
+				curFuel--;
+				g.fillRect(GAME_RIGHT+70, curFuel, 10,  (333-curFuel));
+			}
+			else g.fillRect(GAME_RIGHT+70, (int)(187 + ((double)(146/FUEL_REQUIRED) * (FUEL_REQUIRED - fuelGathered))), 10, (int)(146 - ((double)(146/FUEL_REQUIRED) * (FUEL_REQUIRED - fuelGathered))));
 		}
 		if(foodGathered>0){
 			g.setColor(Resource.FOOD_COLOR);
-			g.fillRect(GAME_RIGHT+100, (int)(187 + ((double)(146/FOOD_REQUIRED) * (FOOD_REQUIRED - foodGathered))), 10, (int)(146 - ((double)(146/FOOD_REQUIRED) * (FOOD_REQUIRED - foodGathered))));
+			if(curFood > (int)(187 + ((double)(146/FOOD_REQUIRED) * (FOOD_REQUIRED - foodGathered)))) {
+				curFood--;
+				g.fillRect(GAME_RIGHT+100, curFood, 10,  (333-curFood));
+			}
+			else g.fillRect(GAME_RIGHT+100, (int)(187 + ((double)(146/FOOD_REQUIRED) * (FOOD_REQUIRED - foodGathered))), 10, (int)(146 - ((double)(146/FOOD_REQUIRED) * (FOOD_REQUIRED - foodGathered))));
 		}
 		//g.setFont(original);
 		g.setColor(Color.black);
@@ -311,7 +435,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		g.drawString("Gravity:", 10, 74);
 		g.drawLine(70, 55, 70, 75);
 		g.drawPolygon(new int[]{60, 80, 70}, new int[]{75, 75, 85}, 3);
-		g.drawString(""+GRAVITY, 80, 74);
+		g.drawString(""+GRAVITY, 90, 74);
 
 		g.drawString("Solar Wind:", 10, 110);
 		g.drawLine(30, 130, 85, 130);
@@ -344,13 +468,13 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 		else if(newx < GAME_LEFT) paddleX = GAME_LEFT;
 		else paddleX =newx;
 		
-		int test = Powerup.generator.nextInt(100);
+		/*int test = Powerup.generator.nextInt(100);
 		if(test==0){
-			//boolean score = Powerup.generator.nextBoolean();
-			boolean score = true;
+			boolean score = Powerup.generator.nextBoolean();
+			//boolean score = true;
 			if(score) resources.add(new Resource(e.getX(), 20, Resource.ResourceType.getRandom()));
-			//else powerups.add(new Powerup(e.getX(), 20));
-		}
+			else powerups.add(new Powerup(e.getX(), 20));
+		}*/
 	}
 	
 	@Override

@@ -1,7 +1,13 @@
 package com.ucfbrickbreaker.brickbreak;
+import java.awt.Graphics;
 import java.lang.Math;
 
-public class Ball{
+import javax.swing.JPanel;
+
+public class Ball extends JPanel{
+	
+
+	private static final long serialVersionUID = 1L;
 	
 	
 	protected static final int defaultRadius = 5;
@@ -34,6 +40,13 @@ public class Ball{
 		launched = true;
 	}
 	
+	@Override
+	public void paintComponent(Graphics g){
+		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/ball1.gif");
+		//i.paintIcon(this, g, x-currentRadius, y-currentRadius);
+		g.fillOval((int) (x - currentRadius), (int) (y - Ball.currentRadius), (int) (2 * currentRadius), (int) (2 * currentRadius));
+	}
+	
 	
 	public void updateMetrics(){
 		
@@ -47,19 +60,23 @@ public class Ball{
 			if (x - currentRadius < GUI.GAME_LEFT){
 				xVelocity = -xVelocity;
 				x = GUI.GAME_LEFT + currentRadius; 
+				//GUI.playSound("C:/Users/Hosam/Desktop/wall.wav");
 			} 
 			else if (x + currentRadius > GUI.GAME_RIGHT){
 				xVelocity = -xVelocity;
 				x = GUI.GAME_RIGHT - currentRadius;
+				//GUI.playSound("C:/Users/Hosam/Desktop/wall.wav");
 			}
 	
 			// Check horizontal boundaries
 			if (y - currentRadius < 0){
 				yVelocity = -yVelocity;
 				y = currentRadius;
+				//GUI.playSound("C:/Users/Hosam/Desktop/roof.wav");
 			} 
 			else if (y + currentRadius > GUI.SCREEN_HEIGHT){
 				destroy = true;
+				//GUI.playSound("death", false);
 				return;
 			}
 	
@@ -81,10 +98,13 @@ public class Ball{
 				y = GUI.PADDLE_HEIGHT - currentRadius;
 	
 				xVelocity = (x - GUI.paddleX) * GUI.PADDLE_ANGLE_DAMPER;
+				//GUI.playSound("C:/Users/Hosam/Desktop/paddle.wav");
 			}
 	
 			// Account for acceleration (gravity)
 			yVelocity += GUI.GRAVITY;
+			if (yVelocity < maxYvel) yVelocity = maxYvel;
+			if (yVelocity > -maxYvel) yVelocity = -maxYvel;
 			xVelocity += GUI.WIND;
 		}
 		
@@ -94,6 +114,7 @@ public class Ball{
 		}
 		
 	}
+	
 	
 	public void launch(){
 		yVelocity = (maxYvel/2) - ((GUI.powerLevel - 5) * GUI.POWER_MULTIPLIER);
