@@ -1,48 +1,52 @@
 package com.ucfbrickbreaker.brickbreak;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
+public class Powerup extends FallingObject
+{
 
+	protected static final long serialVersionUID = 1L;
 
-public class Powerup extends FallingObject{
-	
-	private static final long serialVersionUID = 1L;
-	
-	private Color color;
-	private boolean positiveEffect;
-	protected static Random generator = new Random();
-	
+	protected Color color;
+	protected boolean positiveEffect;
+	//private static Random generator = new Random();
+
 	protected int height, width;
-	
-	
-	public Powerup(int x, int y){
-		super(x,y);
+
+	public Powerup(int x, int y)
+	{
+		super(x, y);
 		height = 16;
 		width = 16;
-		positiveEffect = generator.nextBoolean();
-		if(positiveEffect) color = new Color(70, 150, 30);
-		else color = new Color(220, 30, 50);
+		/*positiveEffect = generator.nextBoolean();
+		if (positiveEffect)
+			color = new Color(70, 150, 30);
+		else
+			color = new Color(220, 30, 50);*/
 	}
-	
-	public void paintComponent(Graphics g){
+
+	public void paintComponent(Graphics g)
+	{
 		super.paintComponent(g);
 		g.setColor(color);
-		g.fillRoundRect(x - (width/2), y - (height/2), width, height, 5, 10000);
-		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/green.png");
-		//i.paintIcon(this, g, x - (width/2), y - (height/2));
+		g.fillRoundRect(x - (width / 2), y - (height / 2), width, height, 5,
+				10000);
 	}
-	
+
 	@Override
-	public void acquireObject() {
-		if(positiveEffect) {
-			if(!GUI.balls.get(0).launched) GUI.balls.get(0).launch();
+	public void acquireObject()
+	{
+		if (positiveEffect)
+		{
+			if (!GUI.balls.get(0).launched)
+				GUI.balls.get(0).launch();
 			int x = GUI.balls.get(0).x;
 			int y = GUI.balls.get(0).y;
-			GUI.balls.add(new Ball(x, y, -2, Ball.maxYvel/4));
-			GUI.balls.add(new Ball(x, y, 2, Ball.maxYvel/4));
+			GUI.balls.add(new Ball(x, y, -2, Ball.maxYvel / 4));
+			GUI.balls.add(new Ball(x, y, 2, Ball.maxYvel / 4));
 		}
 	}
-	
+
 }

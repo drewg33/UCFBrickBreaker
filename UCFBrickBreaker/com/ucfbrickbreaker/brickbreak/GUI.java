@@ -3,6 +3,7 @@ package com.ucfbrickbreaker.brickbreak;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 //import java.util.Random;
 
 import java.io.*;
@@ -16,6 +17,7 @@ import javax.swing.*;
 public class GUI extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
 
 	static final long serialVersionUID = 1L;
+	static Random generator = new Random();
 	
 	protected static final int SCREEN_WIDTH = 880;
 	protected static final int SCREEN_HEIGHT = 480;
@@ -255,7 +257,7 @@ public class GUI extends JPanel implements MouseMotionListener, MouseWheelListen
 	public static void updateWind(){
 		double absRange = GRAVITY/2;
 		double newRange = GRAVITY/2;
-		double temp = Powerup.generator.nextDouble() * newRange;
+		double temp = generator.nextDouble() * newRange;
 		double tempwind = (WIND - (newRange*((WIND+absRange)/(2*absRange)))) + temp;
 		if(tempwind > absRange) tempwind = absRange;
 		else if(tempwind < -absRange) tempwind = -absRange;

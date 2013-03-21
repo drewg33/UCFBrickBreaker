@@ -1,8 +1,7 @@
 package com.ucfbrickbreaker.brickbreak;
+
 import java.awt.Color;
 import java.awt.Graphics;
-
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 
@@ -54,7 +53,7 @@ public class Brick extends JPanel{
 	
 	
 	public boolean detectImpact(){
-		boolean ghostball = !false;
+		boolean ghostball = false;
 		for(Ball b:GUI.balls){
 			if(b.x>=this.x-width/2 && b.x<=this.x+width/2){	
 				if (b.y - Ball.currentRadius < this.y+height/2 && b.yVelocity<0 && b.y>this.y){
@@ -104,7 +103,7 @@ public class Brick extends JPanel{
 		else if(this.type == BrickType.SCRAP) GUI.resources.add(new Resource(this.x, this.y+height/2, Resource.ResourceType.SCRAP));
 		else if(this.type == BrickType.SILVER) GUI.resources.add(new Resource(this.x, this.y+height/2, Resource.ResourceType.SILVER));
 		else if(this.type == BrickType.GOLD) GUI.resources.add(new Resource(this.x, this.y+height/2, Resource.ResourceType.GOLD));
-		else if(this.type == BrickType.POWERUP) GUI.powerups.add(new Powerup(this.x, this.y+height/2));
+		else if(this.type == BrickType.POWERUP) GUI.powerups.add(pickPowerup(this.x, this.y+height/2));
 	}
 	
 	public void paintComponent(Graphics g){
@@ -117,8 +116,21 @@ public class Brick extends JPanel{
 			g.drawString("?", x-5, y+5);
 			g.drawString("?", x-4, y+5);
 		}
-		//ImageIcon i = new ImageIcon("C:/Users/Hosam/Desktop/brick.jpg");
-		//i.paintIcon(this, g, x - (width/2), y - (height/2));
+	}
+	
+	private Powerup pickPowerup(int x, int y) //method to select which type of powerup a brick will hold
+	{
+		int rand = GUI.generator.nextInt(8); //should pass nextInt the number of different powerups
+		Powerup p;
+		switch (rand) //make a new case here for each powerup type. Doesn't have to be a random num, just using that now..
+		{
+			default:
+				p = new Missile(x,y);
+				break;
+				
+		}
+		
+		return p;
 	}
 	
 }
