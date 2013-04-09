@@ -19,11 +19,12 @@ class BBDatabase
 	
 	static boolean SubmitScore(String name, int money, int time)
 	{
+		if (name.length() > 15)
+			return false;
 		for (char c:name.toCharArray())
 		{
 			if (!Character.isAlphabetic(c))
 				return false;
-			
 		}
 		
 		HttpClient httpclient = new DefaultHttpClient();
